@@ -1,16 +1,10 @@
 import { type Cart } from "~/models/Cart";
 import { makeGetRequest, makePostRequest } from ".";
 import { v4 as uuid } from "uuid";
-import { getProduct } from "./products";
 import { type Product } from "~/models/Product";
 
-interface InternalProduct {
-  id: string;
-  quantity: number;
-}
-
-async function getCartProducts(): Promise<InternalProduct[]> {
-  const response = await makeGetRequest<InternalProduct[]>("/cart");
+async function getCartProducts(): Promise<Product[]> {
+  const response = await makeGetRequest<Product[]>("/cart");
 
   if (response.status === 200 && response.data) {
     return response.data;
@@ -22,22 +16,12 @@ async function getCartProducts(): Promise<InternalProduct[]> {
 export async function getCart(): Promise<Cart> {
   return {
     id: uuid(),
-    products: await Promise.all(
-      (
-        await getCartProducts()
-      ).map(async (cartProduct) => {
-        const product = await getProduct(cartProduct.id);
-        return {
-          ...product,
-          quantity: cartProduct.quantity,
-        };
-      })
-    ),
+    products: await getCartProducts(),
   };
 }
 
 export async function addToCart(product: Product): Promise<Product> {
-  const response = await makePostRequest<InternalProduct>("/cart/add", {
+  const response = await makePostRequest<Product>("/cart/add", {
     productId: product.id,
     quantity: product.quantity,
   });
@@ -53,7 +37,7 @@ export async function addToCart(product: Product): Promise<Product> {
 }
 
 export async function removeFromCart(product: Product): Promise<Product> {
-  const response = await makePostRequest<InternalProduct>("/cart/remove", {
+  const response = await makePostRequest<Product>("/cart/remove", {
     productId: product.id,
     quantity: product.quantity,
   });

@@ -1,5 +1,5 @@
 import { type Product } from "~/models/Product";
-import { makeGetRequest } from ".";
+import { makeGetRequest, makePostRequest } from ".";
 
 export async function getProducts(): Promise<Product[]> {
   const response = await makeGetRequest<Product[]>("/products");
@@ -19,4 +19,14 @@ export async function getProduct(id: string): Promise<Product> {
   }
 
   throw new Error("Failed to get product: " + response.error);
+}
+
+export async function createProduct(product: Product): Promise<Product> {
+  const response = await makePostRequest<Product>("/products", product);
+
+  if (response.status === 201 && response.data) {
+    return response.data;
+  }
+
+  throw new Error("Failed to create product: " + response.error);
 }

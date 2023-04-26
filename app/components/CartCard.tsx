@@ -37,7 +37,10 @@ export default function CartCard({ cart }: CartCardProps) {
     sendAction({
       action: "ADD_TO_CART",
       cart,
-      product,
+      product: {
+        ...product,
+        quantity: 1,
+      },
     } as AddToCartAction);
   };
 
@@ -45,7 +48,10 @@ export default function CartCard({ cart }: CartCardProps) {
     sendAction({
       action: "REMOVE_FROM_CART",
       cart,
-      product,
+      product: {
+        ...product,
+        quantity: 1,
+      },
     } as RemoveFromCartAction);
   };
 
@@ -76,22 +82,30 @@ export default function CartCard({ cart }: CartCardProps) {
               <TableBody>
                 {cart.products.map((product) => (
                   <TableRow key={product.id}>
-                    <TableCell>{product.name}</TableCell>
+                    <TableCell>{product.name ?? "Unamed item"}</TableCell>
                     <TableCell align="right">
-                      {"$" + product.price + " / unit"}
-                    </TableCell>
-                    <TableCell>
-                      {"$" + product.price * product.quantity}
+                      {product.price
+                        ? "$" + product.price + " / unit"
+                        : "No price"}
                     </TableCell>
                     <TableCell align="right">
-                      <Stack direction="row" alignItems="center">
-                        <IconButton onClick={() => handleAddToCart(product)}>
-                          <RemoveRoundedIcon />
-                        </IconButton>
-                        <Typography>{product.quantity}</Typography>
+                      {product.price
+                        ? "$" + product.price * product.quantity
+                        : "No price"}
+                    </TableCell>
+                    <TableCell align="right">
+                      <Stack
+                        direction="row"
+                        alignItems="center"
+                        justifyContent="flex-end"
+                      >
                         <IconButton
                           onClick={() => handleRemoveFromCart(product)}
                         >
+                          <RemoveRoundedIcon />
+                        </IconButton>
+                        <Typography>{product.quantity}</Typography>
+                        <IconButton onClick={() => handleAddToCart(product)}>
                           <AddRoundedIcon />
                         </IconButton>
                       </Stack>
@@ -118,6 +132,7 @@ export default function CartCard({ cart }: CartCardProps) {
         <Button
           endIcon={<ShoppingCartCheckoutRoundedIcon />}
           onClick={() => handleCheckout()}
+          disabled={cart.products.length === 0}
         >
           Checkout
         </Button>

@@ -1,25 +1,9 @@
 import { type Order } from "~/models/Order";
 import { makeGetRequest } from ".";
-import { getProduct } from "./products";
 import { type Product } from "~/models/Product";
 
-interface InternalOrderProduct {
-  id: string;
-  name: string;
-  price: number;
-  quantity: number;
-}
-
-interface InternalOrder {
-  id: string;
-  date: string;
-  status: string;
-}
-
-export async function getOrderInternalProducts(
-  orderId: string
-): Promise<InternalOrderProduct[]> {
-  const response = await makeGetRequest<InternalOrderProduct[]>(
+export async function getOrderProducts(orderId: string): Promise<Product[]> {
+  const response = await makeGetRequest<Product[]>(
     `/orders/${orderId}/products`
   );
 
@@ -30,22 +14,21 @@ export async function getOrderInternalProducts(
   throw new Error("Failed to fetch order products");
 }
 
-export async function getOrderProducts(orderId: string): Promise<Product[]> {
-  return Promise.all(
-    (await getOrderInternalProducts(orderId)).map(async (internalProduct) => {
-      const product = await getProduct(internalProduct.id);
-      return {
-        ...product,
-        name: internalProduct.name,
-        price: internalProduct.price,
-        quantity: internalProduct.quantity,
-      } as Product;
-    })
-  );
+export async function getOrder(orderId: string): Promise<Order> {
+  const response = await makeGetRequest<Order>(`/orders/${orderId}`);
+
+  if (response.status === 200 && response.data) {
+    return {
+      ...response.data,
+      products: await getOrderProducts(orderId),
+    };
+  }
+
+  throw new Error("Failed to fetch order");
 }
 
 export async function getOrders(): Promise<Order[]> {
-  const response = await makeGetRequest<InternalOrder[]>("/orders");
+  const response = await makeGetRequest<Order[]>("/orders");
 
   if (response.status === 200 && response.data) {
     return Promise.all(
