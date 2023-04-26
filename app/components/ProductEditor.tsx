@@ -1,6 +1,10 @@
 import { Button, Stack, TextField } from "@mui/material";
+import { useState } from "react";
 import { useSendAction } from "~/actions";
-import { type CatalogEditShowProductsAction } from "~/actions/catalogEditActions";
+import {
+  type CatalogEditCreateProductAction,
+  type CatalogEditShowProductsAction,
+} from "~/actions/catalogEditActions";
 import { type Product } from "~/models/Product";
 
 interface ProductEditorProps {
@@ -8,23 +12,72 @@ interface ProductEditorProps {
   onChange: (product: Product) => void;
 }
 
+interface ProductEditorErrors {
+  checked: boolean;
+  name?: string;
+  description?: string;
+  price?: string;
+  quantity?: string;
+}
+
 export default function ProductEditor({
   product,
   onChange,
 }: ProductEditorProps) {
   const sendAction = useSendAction();
+  const [errors, setErrors] = useState<ProductEditorErrors>({
+    checked: false,
+  });
 
-  const handleSubmit = (product: Product) => {
-    sendAction({
-      action: "CREATE_PRODUCT",
-      product,
-    });
+  const validate = () => {
+    const newErrors = errors;
+    let isValid = true;
+
+    if (!product.name || product.name.length === 0) {
+      newErrors.name = "Name is required";
+      isValid = false;
+    } else {
+      newErrors.name = undefined;
+    }
+
+    if (!product.description || product.description.length === 0) {
+      newErrors.description = "Description is required";
+      isValid = false;
+    } else {
+      newErrors.description = undefined;
+    }
+
+    if (product.price === undefined || product.price < 0) {
+      newErrors.price = "Price must be greater or equal than 0";
+      isValid = false;
+    } else {
+      newErrors.price = undefined;
+    }
+
+    if (product.quantity <= 0) {
+      newErrors.quantity = "Quantity must be greater than 0";
+      isValid = false;
+    } else {
+      newErrors.quantity = undefined;
+    }
+
+    setErrors({ ...newErrors, checked: true });
+    return isValid;
   };
 
   const handleCancel = () => {
     sendAction({
       action: "CATALOG_EDIT_SHOW_PRODUCTS",
     } as CatalogEditShowProductsAction);
+  };
+
+  const handleSubmit = () => {
+    if (validate()) {
+      sendAction({
+        action: "CATALOG_EDIT_CREATE_PRODUCT",
+        product,
+      } as CatalogEditCreateProductAction);
+    }
   };
 
   return (
@@ -35,6 +88,8 @@ export default function ProductEditor({
           onChange={(e) => onChange({ ...product, name: e.target.value })}
           variant="standard"
           label="Name"
+          error={errors.name !== undefined}
+          helperText={errors.name}
         />
         <TextField
           value={product.description ?? "No description"}
@@ -43,6 +98,8 @@ export default function ProductEditor({
           }
           variant="standard"
           label="Description"
+          error={errors.description !== undefined}
+          helperText={errors.description}
         />
         <TextField
           value={product.price ?? 0}
@@ -53,6 +110,8 @@ export default function ProductEditor({
           type="number"
           variant="standard"
           label="Price"
+          error={errors.price !== undefined}
+          helperText={errors.price}
         />
         <TextField
           value={product.quantity ?? 0}
@@ -63,6 +122,8 @@ export default function ProductEditor({
           type="number"
           variant="standard"
           label="Quantity"
+          error={errors.quantity !== undefined}
+          helperText={errors.quantity}
         />
       </Stack>
       <Stack
@@ -81,7 +142,7 @@ export default function ProductEditor({
         <Button
           variant="contained"
           sx={{ flexGrow: 1 }}
-          onClick={() => handleSubmit(product)}
+          onClick={() => handleSubmit()}
         >
           Save
         </Button>

@@ -20,6 +20,7 @@ export default function App() {
   return (
     <html lang="en">
       <head>
+        <title>PolyShop</title>
         <Meta />
         <Links />
       </head>

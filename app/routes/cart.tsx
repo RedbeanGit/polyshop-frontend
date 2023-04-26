@@ -1,8 +1,13 @@
 import { Container, Divider, Typography } from "@mui/material";
-import { type ActionArgs, json, type TypedResponse } from "@remix-run/node";
+import {
+  type ActionArgs,
+  json,
+  type TypedResponse,
+  redirect,
+} from "@remix-run/node";
 import { useLoaderData, useNavigation } from "@remix-run/react";
 import { parseAction } from "~/actions";
-import { type CartAction } from "~/actions/cart";
+import { type CartAction } from "~/actions/cartActions";
 import { addToCart, checkout, getCart, removeFromCart } from "~/api/cart";
 import CartCard from "~/components/CartCard";
 import CircularLoader from "~/components/CircularLoader";
@@ -12,18 +17,22 @@ export async function loader(): Promise<TypedResponse<{ cart: Cart }>> {
   return json({ cart: await getCart() });
 }
 
-export async function action({ request }: ActionArgs): Promise<null> {
+export async function action({
+  request,
+}: ActionArgs): Promise<TypedResponse<null>> {
   const action = await parseAction<CartAction>(request);
 
   switch (action.action) {
-    case "ADD_TO_CART":
+    case "CART_ADD_PRODUCT":
       await addToCart(action.product);
-    case "REMOVE_FROM_CART":
+      return redirect("/cart");
+    case "CART_REMOVE_PRODUCT":
       await removeFromCart(action.product);
-    case "CHECKOUT_CART":
+      return redirect("/cart");
+    case "CART_CHECKOUT":
       await checkout();
+      return redirect("/cart");
   }
-  return null;
 }
 
 export default function CartPage() {
