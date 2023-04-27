@@ -6,5 +6,8 @@ export interface Cart {
 }
 
 export function getCartTotalPrice(cart: Cart) {
-  return cart.products.reduce((total, product) => total + product.price, 0);
+  return cart.products.reduce(
+    (total, product) => total + (product.price ?? 0) * product.quantity,
+    0
+  );
 }

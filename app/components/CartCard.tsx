@@ -21,10 +21,10 @@ import { getCartTotalPrice, type Cart } from "~/models/Cart";
 import { type Product } from "~/models/Product";
 import { useSendAction } from "~/actions";
 import {
-  type RemoveFromCartAction,
-  type AddToCartAction,
-  type CheckoutCartAction,
-} from "~/actions/cart";
+  type CartRemoveProductAction,
+  type CartAddProductAction,
+  type CartCheckoutAction,
+} from "~/actions/cartActions";
 
 interface CartCardProps {
   cart: Cart;
@@ -35,31 +35,28 @@ export default function CartCard({ cart }: CartCardProps) {
 
   const handleAddToCart = (product: Product) => {
     sendAction({
-      action: "ADD_TO_CART",
-      cart,
+      action: "CART_ADD_PRODUCT",
       product: {
         ...product,
         quantity: 1,
       },
-    } as AddToCartAction);
+    } as CartAddProductAction);
   };
 
   const handleRemoveFromCart = (product: Product) => {
     sendAction({
-      action: "REMOVE_FROM_CART",
-      cart,
+      action: "CART_REMOVE_PRODUCT",
       product: {
         ...product,
         quantity: 1,
       },
-    } as RemoveFromCartAction);
+    } as CartRemoveProductAction);
   };
 
   const handleCheckout = () => {
     sendAction({
-      action: "CHECKOUT_CART",
-      cart,
-    } as CheckoutCartAction);
+      action: "CART_CHECKOUT",
+    } as CartCheckoutAction);
   };
 
   return (
@@ -118,7 +115,9 @@ export default function CartCard({ cart }: CartCardProps) {
                   </TableCell>
                   <TableCell colSpan={2} />
                   <TableCell align="right">
-                    {"$" + getCartTotalPrice(cart)}
+                    <Typography fontWeight="bold">
+                      {"$" + getCartTotalPrice(cart)}
+                    </Typography>
                   </TableCell>
                 </TableRow>
               </TableBody>

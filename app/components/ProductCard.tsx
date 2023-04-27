@@ -37,7 +37,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           <Typography variant="body2" color="text.secondary" noWrap>
             {product.description ?? "No description"}
           </Typography>
-          <Typography textAlign="center">
+          <Typography textAlign="center" fontSize={26} fontWeight="bold">
             {product.price ? "$" + product.price : "No price"}
           </Typography>
         </Stack>
