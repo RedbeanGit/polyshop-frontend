@@ -16,5 +16,8 @@ export interface Order {
 }
 
 export function getOrderTotalPrice(order: Order): number {
-  return order.products.reduce((acc, product) => acc + product.price, 0);
+  return order.products.reduce(
+    (acc, product) => acc + (product.price ?? 0) * product.quantity,
+    0
+  );
 }

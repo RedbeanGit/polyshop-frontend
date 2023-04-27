@@ -42,8 +42,8 @@ export default function OrderItem({ order }: OrderItemProps) {
               justifyContent="space-between"
               sx={{ width: "100%" }}
             >
-              <Typography>Items</Typography>
-              <Typography>{`Total price: $${getOrderTotalPrice(
+              <Typography fontWeight="bold">Items</Typography>
+              <Typography fontWeight="bold">{`Total price: $${getOrderTotalPrice(
                 order
               )}`}</Typography>
             </Stack>
