@@ -2,10 +2,12 @@ import { type Product } from "./Product";
 
 export enum OrderStatus {
   CREATED = "CREATED",
-  POSSIBLE = "POSSIBLE",
+  CHECKED = "CHECKED",
+  CHECK_FAILED = "CHECK_FAILED",
   PAID = "PAID",
+  PAYMENT_FAILED = "PAYMENT_FAILED",
   SHIPPED = "SHIPPED",
-  CANCELLED = "CANCELLED",
+  SHIPPING_FAILED = "SHIPPING_FAILED",
 }
 
 export interface Order {
