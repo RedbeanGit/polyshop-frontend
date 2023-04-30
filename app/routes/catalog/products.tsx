@@ -21,7 +21,12 @@ import {
 export async function loader(): Promise<
   TypedResponse<{ products: Product[] }>
 > {
-  return json({ products: await getProducts() });
+  try {
+    return json({ products: await getProducts() });
+  } catch (error) {
+    console.error(error);
+    return redirect("/catalog/error");
+  }
 }
 
 export async function action({
@@ -31,8 +36,13 @@ export async function action({
 
   switch (action.action) {
     case "CATALOG_PRODUCTS_ADD_PRODUCT":
-      await addToCart(action.product);
-      return redirect("/catalog/products");
+      try {
+        await addToCart(action.product);
+        return redirect("/catalog/products");
+      } catch (error) {
+        console.error(error);
+        return redirect("/catalog/error");
+      }
     case "CATALOG_PRODUCTS_SHOW_EDIT":
       return redirect("/catalog/edit");
   }

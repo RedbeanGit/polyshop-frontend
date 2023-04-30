@@ -16,8 +16,13 @@ export async function action({
     case "CATALOG_EDIT_SHOW_PRODUCTS":
       return redirect("/catalog/products");
     case "CATALOG_EDIT_CREATE_PRODUCT":
-      await createProduct(action.product);
-      return redirect("/catalog/products");
+      try {
+        await createProduct(action.product);
+        return redirect("/catalog/products");
+      } catch (error) {
+        console.error(error);
+        return redirect("/catalog/error");
+      }
   }
 }
 
